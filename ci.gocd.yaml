@@ -9,24 +9,30 @@ pipelines:
       - pre-stage:
           clean_workspace: true
           elastic_profile_id: demo-app
-          tasks:
+          jobs:
            - sql-dump:
-               command: /bin/bash
-               arguments:
-                - ./sql-dump.sh
-      - reset-tenant:
+              tasks:
+                - exec: 
+                  command: /bin/bash
+                  arguments:
+                    - ./sql-dump.sh
+      - main-stage:
           clean_workspace: true
           elastic_profile_id: demo-app
-          tasks:
-           - reset-tenant:
-               command: /bin/bash
-               arguments:
-                - ./reset-tenant.sh
+          jobs:
+           - sql-dump:
+              tasks:
+                - exec: 
+                  command: /bin/bash
+                  arguments:
+                    - ./reset-tenant.sh
       - post-stage:
           clean_workspace: true
           elastic_profile_id: demo-app
-          tasks:
-           - clean-s3:
-               command: /bin/bash
-               arguments:
-                - ./clean-s3.sh
+          jobs:
+           - sql-dump:
+              tasks:
+                - exec: 
+                  command: /bin/bash
+                  arguments:
+                    - ./clean-s3.sh
