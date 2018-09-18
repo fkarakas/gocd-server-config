@@ -1,38 +1,25 @@
+format_version: 3
 pipelines:
-  "reset-tenant":
-    group: TENANTS
+  "do-it":
+    group: SRE
     locking: off
     materials:
       git:
-        git: https://github.com/fakarakas/some-scripts.git
+        git: "https://github.com/fakarakas/some-scripts.git"
+        auto_update: false
     stages:
-      - pre-stage:
+      - "pre-stage":
           clean_workspace: true
-          elastic_profile_id: demo-app
+          approval:
+            type: success
+            roles:
+              - SRE
           jobs:
-           - sql-dump:
+            sql-dump:
+              elastic_profile_id: "demo-app"
               tasks:
-                - exec: 
-                  command: /bin/bash
-                  arguments:
-                    - ./sql-dump.sh
-      - main-stage:
-          clean_workspace: true
-          elastic_profile_id: demo-app
-          jobs:
-           - sql-dump:
-              tasks:
-                - exec: 
-                  command: /bin/bash
-                  arguments:
-                    - ./reset-tenant.sh
-      - post-stage:
-          clean_workspace: true
-          elastic_profile_id: demo-app
-          jobs:
-           - sql-dump:
-              tasks:
-                - exec: 
-                  command: /bin/bash
-                  arguments:
-                    - ./clean-s3.sh
+                - exec:
+                    command: /bin/bash
+                    arguments:
+                      - "-c"
+                      - "sleep 5000"
