@@ -1,0 +1,32 @@
+pipelines:
+  "reset-tenant":
+    group: TENANTS
+    locking: off
+    materials:
+      git:
+        git: https://github.com/fakarakas/some-scripts.git
+    stages:
+      - pre-stage:
+          clean_workspace: true
+          elastic_profile_id: demo-app
+          tasks:
+           - sql-dump:
+               command: /bin/bash
+               arguments:
+                - ./sql-dump.sh
+      - reset-tenant:
+          clean_workspace: true
+          elastic_profile_id: demo-app
+          tasks:
+           - reset-tenant:
+               command: /bin/bash
+               arguments:
+                - ./reset-tenant.sh
+      - post-stage:
+          clean_workspace: true
+          elastic_profile_id: demo-app
+          tasks:
+           - clean-s3:
+               command: /bin/bash
+               arguments:
+                - ./clean-s3.sh
