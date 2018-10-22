@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="113">
+      <server artifactsdir="artifacts" agentAutoRegisterKey="d77105d2-8c77-4018-813e-6cfea23081ee" webhookSecret="f524fc1c-7b00-4bc5-937e-617678d1570d" commandRepositoryLocation="default" serverId="457aa03e-e2aa-48c1-908a-39bba56e0299" tokenGenerationKey="e9762ec2-fd62-48c0-8450-c1063014629b">
+        <backup emailOnSuccess="true" emailOnFailure="true" />
+      </server>
+      <elastic>
+        <profiles>
+          <profile id="kube-elasticagent" pluginId="cd.go.contrib.elasticagent.kubernetes">
+            <property>
+              <key>Image</key>
+              <value>gocd/gocd-agent-docker-dind:v18.9.0</value>
+            </property>
+            <property>
+              <key>PodConfiguration</key>
+              <value>apiVersion: v1
+    kind: Pod
+    metadata:
+      name: pod-name-prefix-{{ POD_POSTFIX }}
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: gocd-agent-container-{{ CONTAINER_POSTFIX }}
+          image: {{ GOCD_AGENT_IMAGE }}:{{ LATEST_VERSION }}
+          securityContext:
+            privileged: true</value>
+            </property>
+            <property>
+              <key>SpecifiedUsingPodConfiguration</key>
+              <value>false</value>
+            </property>
+            <property>
+              <key>Privileged</key>
+              <value>true</value>
+            </property>
+          </profile>
+        </profiles>
+      </elastic>
+      <pipelines group="sample">
+        <pipeline name="hello_world">
+          <materials>
+            <git url="https://github.com/gocd-contrib/getting-started-repo" shallowClone="true" />
+          </materials>
+          <stage name="default_stage">
+            <jobs>
+              <job name="default_job" elasticProfileId="kube-elasticagent">
+                <tasks>
+                  <exec command="echo">
+                    <arg>Hello World</arg>
+                  </exec>
+                </tasks>
+              </job>
+            </jobs>
+          </stage>
+        </pipeline>
+      </pipelines>
+    </cruise>
