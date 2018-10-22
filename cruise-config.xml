@@ -37,7 +37,7 @@
         </profiles>
       </elastic>
       <pipelines group="sample">
-        <pipeline name="yyyyhello_world">
+        <pipeline name="rrrrrrhello_world">
           <materials>
             <git url="https://github.com/gocd-contrib/getting-started-repo" shallowClone="true" />
           </materials>
